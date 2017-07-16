@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
+#include <ctype.h>
 
 char fs(int p1, int p2)
 {
@@ -15,14 +17,42 @@ char fs(int p1, int p2)
 
 void human_vs_human()
 {
-	int i,j,turn=1,n,square=0;
+	int i,j,turn=1,n,square=0,k,c;
+	char *s;
 	bool res;
 	printf("Enter the no. of rows (or columns) (between 3 and 9 - both inclusive): ");
 	do
 	{
-		scanf("%d",&n);
-		if(n<3 || n>9)
-			printf("Wrong input.. Enter again...\n");
+		error_human_1:
+		k=0;
+		free(s);
+		s=malloc(1);
+		do
+    	{
+    	    c = getchar();
+    	    s[k++] = c;
+    	    s = realloc(s, k+1);
+    	}while(c != '\n' && c != EOF);
+    	s[k] = '\0';
+    	if(strlen(s) > 2)
+    	{
+    		printf("Wrong input.. Enter again...\n");
+    		goto error_human_1;
+    	}
+    	else if(!(isdigit(s[0])))
+    	{
+    		printf("Wrong input.. Enter again...\n");
+    		goto error_human_1;
+    	}
+		else
+		{
+			n=(int)s[0]-'0';
+			if(n<3 || n>9)
+			{
+				printf("Wrong input.. Enter again...\n");
+				goto error_human_1;
+			}
+		}
 	}while(n<3 || n>9);
 	int *p1=(int*)calloc(n*n,sizeof(int));
 	int *p2=(int*)calloc(n*n,sizeof(int));
@@ -51,15 +81,70 @@ void human_vs_human()
 		}
 		do
 		{
-			printf("Enter the row and column no. for your move (0 to %d - both inclusive)\n",n-1);
-			enter_again: //in case invalid input is given
-			scanf("%d%d",&i,&j);
-			if(i<0 || j<0 || i>=n || j>=n)
+			enter_again:
+			printf("Enter the row no. for your move (0 to %d - both inclusive)\n",n-1);
+			error_human_2:
+			k=0;
+			free(s);
+			s=malloc(1);
+			do
+	    	{
+	    	    c = getchar();
+	    	    s[k++] = c;
+	    	    s = realloc(s, k+1);
+	    	}while(c != '\n' && c != EOF);
+	    	s[k] = '\0';
+	    	if(strlen(s) > 2)
+	    	{
+	    		printf("Wrong input.. Enter again...\n");
+	    		goto error_human_2;
+	    	}
+	    	else if(!(isdigit(s[0])))
+	    	{
+	    		printf("Wrong input.. Enter again...\n");
+	    		goto error_human_2;
+	    	}
+			else
 			{
-				printf("Wrong input.. Enter again...\n");
-				goto enter_again;
+				i=(int)s[0]-'0';
+				if(i<0 || i>=n)
+				{
+					printf("Wrong input.. Enter again...\n");
+					goto error_human_2;
+				}
 			}
-			else if(p1[i*n + j]==1 || p2[i*n + j]==1)
+			printf("Enter the column no. for your move (0 to %d - both inclusive)\n",n-1);
+			error_human_3:
+			k=0;
+			free(s);
+			s=malloc(1);
+			do
+	    	{
+	    	    c = getchar();
+	    	    s[k++] = c;
+	    	    s = realloc(s, k+1);
+	    	}while(c != '\n' && c != EOF);
+	    	s[k] = '\0';
+	    	if(strlen(s) > 2)
+	    	{
+	    		printf("Wrong input.. Enter again...\n");
+	    		goto error_human_3;
+	    	}
+	    	else if(!(isdigit(s[0])))
+	    	{
+	    		printf("Wrong input.. Enter again...\n");
+	    		goto error_human_3;
+	    	}
+			else
+			{
+				j=(int)s[0]-'0';
+				if(j<0 || j>=n)
+				{
+					printf("Wrong input.. Enter again...\n");
+					goto error_human_3;
+				}
+			}
+			if(p1[i*n + j]==1 || p2[i*n + j]==1)
 			{
 				printf("Position is already occupied.. Enter again...\n");
 				goto enter_again;
@@ -183,27 +268,45 @@ void human_vs_human()
 
 int main()
 {
-	int option;
+	int option,c,i=0;
+	char *s = malloc(1);
 	printf("Welcome to the world of Tic-Tac-Toe...\n\n");
 	do
 	{
 		printf("Select:\n");
-		printf(" 1 for 1-player (HUMAN vs AI)\n");
 		printf(" 2 for 2-player (HUMAN vs HUMAN)\n");
 		printf(" or 0 to exit\n");
 		enter_again_main: //in case of an invalid input
-		scanf("%d",&option);
-		switch(option)
+		free(s); s=malloc(1); i=0;
+		do
+    	{
+    	    c = getchar();
+    	    s[i++] = c;
+    	    s = realloc(s, i+1);
+    	}while(c != '\n' && c != EOF);
+    	s[i] = '\0';
+    	if(strlen(s) > 2)
+    		goto default_error;
+    	else if(!(isdigit(s[0])))
+    		goto default_error;
+		else
 		{
-			/*case 1:human_vs_ai();
-			       break;*/
-			case 2:human_vs_human();
-			       break;
-			case 0:printf("Hope to see you again soon..\n");
-			       break;
-			default:printf("Wrong input.. Enter again...\n");
-				goto enter_again_main;
+			option=(int)s[0]-'0';
+			switch(option)
+			{
+				/*case 1:human_vs_ai();
+				       break;*/
+				case 2:human_vs_human();
+				       break;
+				case 0:printf("Hope to see you again soon..\n");
+				       break;
+				default:default_error:
+						printf("Wrong input.. Enter again...\n");
+						goto enter_again_main;
+			}
 		}
 	}while(option);
+	printf("\n");
+	system("pause");
 	return 0;
 }
